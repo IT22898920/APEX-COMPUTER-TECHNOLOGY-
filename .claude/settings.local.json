@@ -1,0 +1,36 @@
+{
+  "permissions": {
+    "allow": [
+      "WebFetch(domain:purelech.lk)",
+      "WebFetch(domain:www.purelech.lk)",
+      "Bash(npx create-next-app@latest:*)",
+      "Bash(npx shadcn@latest init -d)",
+      "Bash(npm install @supabase/supabase-js @supabase/ssr lucide-react date-fns zod react-hook-form @hookform/resolvers)",
+      "Bash(npx shadcn@latest add button card input label badge dialog dropdown-menu avatar select textarea table tabs separator sheet toast sonner form -y)",
+      "Bash(npx shadcn@latest add button card input label badge dialog dropdown-menu avatar select textarea table tabs separator sheet sonner form -y)",
+      "Bash(npm run build:*)",
+      "Bash(tail:*)",
+      "Bash(npx next lint)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run dev:*)",
+      "Bash(npx tsx:*)",
+      "Bash(ping:*)",
+      "Bash(npx shadcn@latest add:*)",
+      "Bash(npx supabase --version)",
+      "Bash(npx supabase db push:*)",
+      "Bash(cat:*)",
+      "Bash(curl -X POST \"https://vhxqmtgrfjdaubtsbpqu.supabase.co/rest/v1/rpc/exec_sql\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeHFtdGdyZmpkYXVidHNicHF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODU0NzkzMiwiZXhwIjoyMDg0MTIzOTMyfQ.EuWjsJbsutiWeCP73sKI6HGOBYYqayvXFIF1RgtX3Go\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeHFtdGdyZmpkYXVidHNicHF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODU0NzkzMiwiZXhwIjoyMDg0MTIzOTMyfQ.EuWjsJbsutiWeCP73sKI6HGOBYYqayvXFIF1RgtX3Go\" -H \"Content-Type: application/json\" -d @-)",
+      "Bash(node scripts/cleanup-services.mjs:*)",
+      "Bash(node -e \"\nconst { createClient } = require\\(''@supabase/supabase-js''\\);\nconst supabase = createClient\\(''https://vhxqmtgrfjdaubtsbpqu.supabase.co'', ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeHFtdGdyZmpkYXVidHNicHF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODU0NzkzMiwiZXhwIjoyMDg0MTIzOTMyfQ.EuWjsJbsutiWeCP73sKI6HGOBYYqayvXFIF1RgtX3Go''\\);\n\nasync function del\\(\\) {\n  // Delete Emergency Response and Maintenance Contracts \\(keep Service Agreements\\)\n  await supabase.from\\(''services''\\).delete\\(\\).eq\\(''slug'', ''emergency-response''\\);\n  await supabase.from\\(''services''\\).delete\\(\\).eq\\(''slug'', ''maintenance-contracts''\\);\n  \n  const { data } = await supabase.from\\(''services''\\).select\\(''title''\\).order\\(''display_order''\\);\n  console.log\\(''Remaining '' + data.length + '' services:''\\);\n  data.forEach\\(\\(s, i\\) => console.log\\(\\(i+1\\) + ''. '' + s.title\\)\\);\n}\ndel\\(\\);\n\")",
+      "Bash(node -e \"\nconst { createClient } = require\\(''@supabase/supabase-js''\\);\nconst supabase = createClient\\(''https://vhxqmtgrfjdaubtsbpqu.supabase.co'', ''eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeHFtdGdyZmpkYXVidHNicHF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODU0NzkzMiwiZXhwIjoyMDg0MTIzOTMyfQ.EuWjsJbsutiWeCP73sKI6HGOBYYqayvXFIF1RgtX3Go''\\);\n\nasync function check\\(\\) {\n  const { data } = await supabase.from\\(''services''\\).select\\(''title''\\).order\\(''display_order''\\);\n  console.log\\(''Total: '' + data.length + '' services''\\);\n  data.forEach\\(\\(s, i\\) => console.log\\(\\(i+1\\) + ''. '' + s.title\\)\\);\n}\ncheck\\(\\);\n\")",
+      "Bash(node scripts/setup-storage.mjs:*)",
+      "Bash(node -e:*)",
+      "Bash(curl -X POST \"https://vhxqmtgrfjdaubtsbpqu.supabase.co/rest/v1/rpc/exec_sql\" -H \"apikey: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeHFtdGdyZmpkYXVidHNicHF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODU0NzkzMiwiZXhwIjoyMDg0MTIzOTMyfQ.EuWjsJbsutiWeCP73sKI6HGOBYYqayvXFIF1RgtX3Go\" -H \"Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZoeHFtdGdyZmpkYXVidHNicHF1Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2ODU0NzkzMiwiZXhwIjoyMDg0MTIzOTMyfQ.EuWjsJbsutiWeCP73sKI6HGOBYYqayvXFIF1RgtX3Go\" -H \"Content-Type: application/json\" -d '{\"\"query\"\": \"\"ALTER TABLE products ADD COLUMN IF NOT EXISTS images JSONB DEFAULT ''''[]'''';\"\"}')",
+      "Bash(npm install:*)",
+      "Bash(dir \"C:\\\\Users\\\\DELL\\\\Pictures\" /b)",
+      "Bash(rm:*)",
+      "Bash(node scripts/add-products.mjs:*)",
+      "Bash(node scripts/add-product-images.mjs:*)"
+    ]
+  }
+}
