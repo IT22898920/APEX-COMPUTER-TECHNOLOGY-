@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Loader2, Save } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Plus, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,10 +25,17 @@ interface Category {
   name: string
 }
 
+interface CustomField {
+  id: string
+  label: string
+  value: string
+}
+
 export default function NewProductPage() {
   const router = useRouter()
   const [isLoading, setIsLoading] = useState(false)
   const [categories, setCategories] = useState<Category[]>([])
+  const [customFields, setCustomFields] = useState<CustomField[]>([])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -62,6 +69,24 @@ export default function NewProductPage() {
     loadCategories()
   }, [])
 
+  // Custom fields handlers
+  const addCustomField = () => {
+    setCustomFields([
+      ...customFields,
+      { id: crypto.randomUUID(), label: '', value: '' }
+    ])
+  }
+
+  const updateCustomField = (id: string, field: 'label' | 'value', newValue: string) => {
+    setCustomFields(customFields.map(cf =>
+      cf.id === id ? { ...cf, [field]: newValue } : cf
+    ))
+  }
+
+  const removeCustomField = (id: string) => {
+    setCustomFields(customFields.filter(cf => cf.id !== id))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -75,6 +100,14 @@ export default function NewProductPage() {
 
     const supabase = createClient()
 
+    // Convert custom fields to object format
+    const specifications: Record<string, string> = {}
+    customFields.forEach(cf => {
+      if (cf.label.trim() && cf.value.trim()) {
+        specifications[cf.label.trim()] = cf.value.trim()
+      }
+    })
+
     const { error } = await (supabase.from('products') as any).insert({
       sku: formData.sku.toUpperCase(),
       name: formData.name,
@@ -87,6 +120,7 @@ export default function NewProductPage() {
       stock_quantity: parseInt(formData.stock_quantity) || 0,
       reorder_level: parseInt(formData.reorder_level) || 5,
       is_active: formData.is_active,
+      specifications: Object.keys(specifications).length > 0 ? specifications : null,
     })
 
     setIsLoading(false)
@@ -172,7 +206,7 @@ export default function NewProductPage() {
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
                 <Select
-                  value={formData.category_id}
+                  value={formData.category_id || undefined}
                   onValueChange={(value) => setFormData({ ...formData, category_id: value })}
                 >
                   <SelectTrigger>
@@ -289,6 +323,63 @@ export default function NewProductPage() {
             </CardContent>
           </Card>
         </div>
+
+        {/* Custom Specifications Card */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Custom Specifications</CardTitle>
+            <CardDescription>
+              Add custom fields for additional product details (e.g., Brand, Model, Warranty, etc.)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {customFields.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
+                <p className="mb-2">No custom fields added yet</p>
+                <p className="text-sm">Click the button below to add custom specifications</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {customFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-3 items-start">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Field Name (e.g., Brand, RAM Size)"
+                        value={field.label}
+                        onChange={(e) => updateCustomField(field.id, 'label', e.target.value)}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Value (e.g., Intel, 16GB)"
+                        value={field.value}
+                        onChange={(e) => updateCustomField(field.id, 'value', e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => removeCustomField(field.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addCustomField}
+              className="w-full"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Custom Field
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Images Card - Full Width */}
         <Card className="mt-6">

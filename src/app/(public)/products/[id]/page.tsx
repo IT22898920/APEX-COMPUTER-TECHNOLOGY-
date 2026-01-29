@@ -10,6 +10,7 @@ import {
   Phone,
   CheckCircle2,
   MessageCircle,
+  Info,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/button'
@@ -34,6 +35,7 @@ interface Product {
   stock_quantity: number
   category_id: string | null
   category: { id: string; name: string; slug: string } | null
+  specifications: Record<string, string> | null
 }
 
 async function getProduct(id: string): Promise<Product | null> {
@@ -52,6 +54,7 @@ async function getProduct(id: string): Promise<Product | null> {
       cost_price,
       stock_quantity,
       category_id,
+      specifications,
       category:categories(id, name, slug)
     `)
     .eq('id', id)
@@ -196,6 +199,35 @@ export default async function ProductDetailPage({
                 <p className="text-muted-foreground leading-relaxed">
                   {product.description}
                 </p>
+              </div>
+            )}
+
+            {/* Specifications */}
+            {product.specifications && Object.keys(product.specifications).length > 0 && (
+              <div>
+                <h3 className="font-semibold mb-3 flex items-center gap-2">
+                  <Info className="h-5 w-5 text-primary" />
+                  Specifications
+                </h3>
+                <div className="rounded-lg border overflow-hidden">
+                  <table className="w-full">
+                    <tbody>
+                      {Object.entries(product.specifications).map(([key, value], index) => (
+                        <tr
+                          key={key}
+                          className={index % 2 === 0 ? 'bg-muted/30' : 'bg-background'}
+                        >
+                          <td className="px-4 py-3 font-medium text-sm w-1/3 border-r">
+                            {key}
+                          </td>
+                          <td className="px-4 py-3 text-sm text-muted-foreground">
+                            {value}
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 

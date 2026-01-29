@@ -95,7 +95,7 @@ export function Sidebar({ collapsed = false, onCollapse }: SidebarProps) {
               height={40}
               className="h-10 w-auto"
             />
-            <span className="font-bold text-lg">Apex Tech</span>
+            <span className="font-bold text-lg">Apex Computer</span>
           </Link>
         )}
         {collapsed && (

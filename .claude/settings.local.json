@@ -35,7 +35,8 @@
       "Bash(node scripts/add-service-images.mjs:*)",
       "Bash(node scripts/setup-reports.mjs:*)",
       "Bash(node scripts/setup-signatures.mjs:*)",
-      "Bash(wc:*)"
+      "Bash(wc:*)",
+      "Bash(node scripts/add-premium-products.mjs:*)"
     ]
   }
 }

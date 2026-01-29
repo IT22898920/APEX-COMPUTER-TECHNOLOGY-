@@ -6,6 +6,13 @@ import Image from 'next/image'
 import { ArrowRight, Clock, Shield, Users, Zap, Sparkles, CheckCircle2, Laptop, Monitor, Printer, Server, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { COMPANY_INFO } from '@/lib/utils/constants'
+import dynamic from 'next/dynamic'
+
+// Dynamically import 3D scene to avoid SSR issues
+const Hero3DScene = dynamic(() => import('./hero-3d-scene').then(mod => ({ default: mod.Hero3DScene })), {
+  ssr: false,
+  loading: () => null,
+})
 
 const stats = [
   { icon: Users, value: '500+', label: 'Happy Clients' },
@@ -44,6 +51,9 @@ export function Hero() {
         <div className="absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[800px] rounded-full bg-cyan-500/10 blur-[100px]" />
       </div>
 
+      {/* 3D Scene Background */}
+      {mounted && <Hero3DScene />}
+
       {/* Floating tech icons */}
       {mounted && floatingItems.map((item, index) => (
         <div
@@ -68,40 +78,54 @@ export function Hero() {
         }} />
       </div>
 
-      <div className="container py-16 sm:py-20 md:py-24 relative z-10">
+      <div className="container py-16 sm:py-20 md:py-24 relative z-20">
         <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
           {/* Left Content */}
           <div className={`text-center lg:text-left transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
+            {/* Company Name - Big & Bold */}
+            <div className="mb-6">
+              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight">
+                <span className="text-transparent bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text">
+                  APEX
+                </span>
+                <span className="text-white">
+                  {' '}COMPUTER
+                </span>
+              </h1>
+              <p className="text-lg sm:text-xl md:text-2xl font-medium text-slate-400 tracking-[0.3em] mt-1">
+                TECHNOLOGY
+              </p>
+            </div>
+
             {/* Badge */}
-            <div className="mb-6 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm px-4 py-2 text-sm font-medium text-primary shadow-lg shadow-primary/10">
+            <div className="mb-4 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm px-4 py-2 text-sm font-medium text-primary shadow-lg shadow-primary/10">
               <Sparkles className="mr-2 h-4 w-4" />
               <span>2-3 Hour Guaranteed Response Time</span>
             </div>
 
-            {/* Headline */}
-            <h1 className="mb-6 text-4xl font-bold tracking-tight sm:text-5xl md:text-6xl lg:text-7xl text-white">
+            {/* Tagline */}
+            <h2 className="mb-4 text-xl font-semibold tracking-tight sm:text-2xl md:text-3xl text-white">
               Your Trusted{' '}
               <span className="relative">
                 <span className="text-transparent bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text">
                   IT Partner
                 </span>
-                <span className="absolute -bottom-2 left-0 right-0 h-1 bg-gradient-to-r from-primary via-blue-400 to-cyan-400 rounded-full" />
               </span>
               {' '}in Sri Lanka
-            </h1>
+            </h2>
 
             {/* Subheadline */}
-            <p className="mb-8 text-lg text-slate-300 sm:text-xl max-w-xl mx-auto lg:mx-0 leading-relaxed">
+            <p className="mb-6 text-base text-slate-300 sm:text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed">
               Premium IT products, expert repairs, and dedicated support.
               Everything your business needs to stay connected and productive.
             </p>
 
             {/* Highlights */}
-            <div className="mb-8 flex flex-col sm:flex-row gap-3 justify-center lg:justify-start">
+            <div className="mb-6 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center lg:justify-start flex-wrap">
               {highlights.map((highlight) => (
                 <div key={highlight} className="flex items-center gap-2 text-slate-300">
-                  <CheckCircle2 className="h-5 w-5 text-green-400 shrink-0" />
-                  <span className="text-sm">{highlight}</span>
+                  <CheckCircle2 className="h-4 w-4 text-green-400 shrink-0" />
+                  <span className="text-xs sm:text-sm">{highlight}</span>
                 </div>
               ))}
             </div>
@@ -121,7 +145,7 @@ export function Hero() {
               <Button
                 size="lg"
                 variant="outline"
-                className="border-slate-500 text-white hover:bg-white/10 backdrop-blur-sm px-8 text-lg h-14"
+                className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 text-lg h-14"
                 asChild
               >
                 <Link href="/services">Our Services</Link>

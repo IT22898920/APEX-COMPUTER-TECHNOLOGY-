@@ -3,7 +3,7 @@
 import { useState, useEffect, use } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Loader2, Save, Package } from 'lucide-react'
+import { ArrowLeft, Loader2, Save, Package, Plus, Trash2 } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -25,6 +25,12 @@ interface Category {
   name: string
 }
 
+interface CustomField {
+  id: string
+  label: string
+  value: string
+}
+
 interface Product {
   id: string
   sku: string
@@ -38,6 +44,7 @@ interface Product {
   stock_quantity: number
   reorder_level: number
   is_active: boolean
+  specifications: Record<string, string> | null
 }
 
 export default function EditProductPage({ params }: { params: Promise<{ id: string }> }) {
@@ -47,6 +54,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
   const [isFetching, setIsFetching] = useState(true)
   const [categories, setCategories] = useState<Category[]>([])
   const [product, setProduct] = useState<Product | null>(null)
+  const [customFields, setCustomFields] = useState<CustomField[]>([])
 
   // Form state
   const [formData, setFormData] = useState({
@@ -104,6 +112,16 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         is_active: typedProduct.is_active,
       })
 
+      // Load existing specifications into customFields
+      if (typedProduct.specifications) {
+        const loadedFields = Object.entries(typedProduct.specifications).map(([label, value]) => ({
+          id: crypto.randomUUID(),
+          label,
+          value: value as string,
+        }))
+        setCustomFields(loadedFields)
+      }
+
       // Load categories
       const { data: categoriesData } = await supabase
         .from('categories')
@@ -121,6 +139,24 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     loadData()
   }, [id, router])
 
+  // Custom fields handlers
+  const addCustomField = () => {
+    setCustomFields([
+      ...customFields,
+      { id: crypto.randomUUID(), label: '', value: '' }
+    ])
+  }
+
+  const updateCustomField = (id: string, field: 'label' | 'value', newValue: string) => {
+    setCustomFields(customFields.map(cf =>
+      cf.id === id ? { ...cf, [field]: newValue } : cf
+    ))
+  }
+
+  const removeCustomField = (id: string) => {
+    setCustomFields(customFields.filter(cf => cf.id !== id))
+  }
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setIsLoading(true)
@@ -133,6 +169,14 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
     }
 
     const supabase = createClient()
+
+    // Convert custom fields to object format
+    const specifications: Record<string, string> = {}
+    customFields.forEach(cf => {
+      if (cf.label.trim() && cf.value.trim()) {
+        specifications[cf.label.trim()] = cf.value.trim()
+      }
+    })
 
     const { error } = await (supabase
       .from('products') as any)
@@ -148,6 +192,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
         stock_quantity: parseInt(formData.stock_quantity) || 0,
         reorder_level: parseInt(formData.reorder_level) || 5,
         is_active: formData.is_active,
+        specifications: Object.keys(specifications).length > 0 ? specifications : null,
       })
       .eq('id', id)
 
@@ -256,7 +301,7 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
               <div className="space-y-2">
                 <Label htmlFor="category">Category</Label>
                 <Select
-                  value={formData.category_id}
+                  value={formData.category_id || undefined}
                   onValueChange={(value) => setFormData({ ...formData, category_id: value })}
                 >
                   <SelectTrigger>
@@ -373,6 +418,63 @@ export default function EditProductPage({ params }: { params: Promise<{ id: stri
             </CardContent>
           </Card>
         </div>
+
+        {/* Custom Specifications Card */}
+        <Card className="mt-6">
+          <CardHeader>
+            <CardTitle>Custom Specifications</CardTitle>
+            <CardDescription>
+              Add custom fields for additional product details (e.g., Brand, Model, Warranty, etc.)
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-4">
+            {customFields.length === 0 ? (
+              <div className="text-center py-6 text-muted-foreground border-2 border-dashed rounded-lg">
+                <p className="mb-2">No custom fields added yet</p>
+                <p className="text-sm">Click the button below to add custom specifications</p>
+              </div>
+            ) : (
+              <div className="space-y-3">
+                {customFields.map((field, index) => (
+                  <div key={field.id} className="flex gap-3 items-start">
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Field Name (e.g., Brand, RAM Size)"
+                        value={field.label}
+                        onChange={(e) => updateCustomField(field.id, 'label', e.target.value)}
+                      />
+                    </div>
+                    <div className="flex-1">
+                      <Input
+                        placeholder="Value (e.g., Intel, 16GB)"
+                        value={field.value}
+                        onChange={(e) => updateCustomField(field.id, 'value', e.target.value)}
+                      />
+                    </div>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive hover:bg-destructive/10"
+                      onClick={() => removeCustomField(field.id)}
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
+                ))}
+              </div>
+            )}
+            <Button
+              type="button"
+              variant="outline"
+              onClick={addCustomField}
+              className="w-full"
+            >
+              <Plus className="mr-2 h-4 w-4" />
+              Add Custom Field
+            </Button>
+          </CardContent>
+        </Card>
 
         {/* Images Card - Full Width */}
         <Card className="mt-6">
