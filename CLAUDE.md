@@ -1,214 +1,105 @@
-# APEX Computer Technology - Project Guide
+# CLAUDE.md
 
-## Project Overview
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-A comprehensive Service & Sales Management System for a computer technology company in Sri Lanka. Built with Next.js 15, Supabase, and Tailwind CSS.
+## Build & Development Commands
 
-## Tech Stack
-
-- **Framework**: Next.js 15 (App Router)
-- **Language**: TypeScript
-- **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth (Email/Password, Magic Link, Google OAuth)
-- **Styling**: Tailwind CSS v4 with shadcn/ui components
-- **State Management**: React hooks + Supabase real-time
-- **Validation**: Zod schemas
-- **Icons**: Lucide React
-
-## Project Structure
-
-```
-src/
-├── app/                    # Next.js App Router pages
-│   ├── (auth)/            # Authentication pages (login, register)
-│   ├── (dashboard)/       # Protected dashboard routes
-│   │   ├── admin/         # Admin panel pages
-│   │   ├── staff/         # Staff panel pages
-│   │   └── customer/      # Customer portal pages
-│   └── (public)/          # Public pages (home, products, etc.)
-├── components/
-│   ├── layout/            # Layout components (sidebar, header, footer)
-│   ├── ui/                # shadcn/ui components
-│   └── sections/          # Page sections (hero, services, etc.)
-├── lib/
-│   ├── supabase/          # Supabase clients (client, server, admin, middleware)
-│   ├── hooks/             # Custom React hooks
-│   ├── utils/             # Utility functions
-│   ├── validations/       # Zod validation schemas
-│   └── auth/              # Authentication utilities
-└── types/                 # TypeScript type definitions
+```bash
+npm run dev      # Start development server (http://localhost:3000)
+npm run build    # Production build
+npm run lint     # Run ESLint
+npx tsc --noEmit # Type check without emitting files
 ```
 
-## User Roles & Permissions
+## Architecture Overview
 
-### Admin
-- Full system access
-- User management (create, edit, delete, change roles)
-- Product management
-- Order management
-- Service ticket oversight
-- Reports & analytics
+### Application Structure
 
-### Staff (3 types)
-- **Technician**: Service tickets, repairs
-- **Marketing**: Products, inventory, orders
-- **Support**: Customer service, ticket handling
+This is a Next.js 15 App Router application with Supabase backend for a computer technology company's service and sales management system.
 
-### Customer
-- View/create service tickets
-- View orders and order history
-- Manage profile
+**Route Groups:**
+- `(auth)` - Login/register pages (public)
+- `(public)` - Public website pages (home, products, services, inquiry)
+- `(dashboard)` - Protected routes split by role:
+  - `/admin/*` - Full system management
+  - `/staff/*` - Role-specific staff panels (technician, marketing, support)
+  - `/customer/*` - Customer portal
 
-## Database Schema
+### Supabase Client Usage
 
-### Core Tables
-- `profiles` - User profiles (extends auth.users)
-- `products` - Product catalog
-- `categories` - Product categories
-- `orders` - Customer orders
-- `order_items` - Order line items
-- `service_agreements` - Customer service contracts
-- `service_tickets` - Service/repair tickets
-- `ticket_notes` - Notes on tickets
-- `ticket_history` - Ticket change logs
-- `notifications` - User notifications
-- `inventory_logs` - Stock movement tracking
+Four different Supabase clients exist for different contexts:
 
-### Key Database Features
-- Row Level Security (RLS) on all tables
-- Auto-generated ticket/order numbers
-- SLA deadline calculation
-- Inventory auto-deduction on orders/repairs
+| Client | File | Use Case |
+|--------|------|----------|
+| Browser | `src/lib/supabase/client.ts` | Client components |
+| Server | `src/lib/supabase/server.ts` | Server components, server actions |
+| Admin | `src/lib/supabase/admin.ts` | Service role operations (bypasses RLS) |
+| Middleware | `src/lib/supabase/middleware.ts` | Route protection |
 
-## Security Implementation
+**Important:** Always use `as any` type assertion for Supabase queries to avoid complex typing issues:
+```typescript
+const { data } = await (supabase.from('table') as any).select('*')
+```
 
-### Headers (next.config.ts)
-- Strict-Transport-Security
-- X-Content-Type-Options: nosniff
-- X-Frame-Options: SAMEORIGIN
-- X-XSS-Protection
-- Referrer-Policy
+### Authentication & Authorization
 
-### Authentication
-- Strong password policy (8+ chars, uppercase, lowercase, number, special char)
-- Rate limiting (60 req/min per user)
-- Session management via Supabase
+- Middleware (`src/middleware.ts`) handles route protection
+- Role-based access: `admin`, `staff` (with `staff_type`: technician/marketing/support), `customer`
+- Server actions use `createSecureAction` or `createAdminAction` from `src/lib/auth/secure-action.ts`
 
-### Authorization
-- Middleware-based route protection
-- Role-based access control
-- Server action authorization checks
+### Email System
 
-## Important Files
+Uses Resend (`src/lib/email/resend.ts`) for transactional emails:
+- Templates in `src/lib/email/templates/`
+- Requires `RESEND_API_KEY` environment variable
+- Domain verification needed for production
 
-### Configuration
-- `.env.local` - Environment variables (DO NOT COMMIT)
-- `next.config.ts` - Next.js config with security headers
-- `tailwind.config.ts` - Tailwind configuration
-- `components.json` - shadcn/ui configuration
+### Database
 
-### Supabase Clients
-- `src/lib/supabase/client.ts` - Browser client
-- `src/lib/supabase/server.ts` - Server component client
-- `src/lib/supabase/admin.ts` - Service role client (admin ops)
-- `src/lib/supabase/middleware.ts` - Middleware client
+- All tables have Row Level Security (RLS) enabled
+- Migrations in `supabase/migrations/` (run in Supabase SQL Editor)
+- `profiles` table auto-syncs with `auth.users`
+- Helper functions: `is_admin()`, `is_staff()` for RLS policies
 
-### Key Hooks
-- `src/lib/hooks/use-user.ts` - User session & profile management
+### Key Patterns
 
-### Validation Schemas
-- `src/lib/validations/auth.ts` - Login/register validation
-- `src/lib/validations/index.ts` - All other validations
+**Server Actions:**
+```typescript
+import { createAdminAction } from '@/lib/auth/secure-action'
+
+export const myAction = createAdminAction(
+  zodSchema,
+  async (input, { user, supabase }) => { /* ... */ }
+)
+```
+
+**Data Fetching in Server Components:**
+```typescript
+import { createClient } from '@/lib/supabase/server'
+
+const supabase = await createClient()
+const { data } = await (supabase.from('orders') as any).select('*')
+```
+
+### UI Components
+
+- shadcn/ui components in `src/components/ui/`
+- Toast notifications via `sonner`
+- Forms use `react-hook-form` with `@hookform/resolvers/zod`
+- Icons from `lucide-react`
 
 ## Environment Variables
 
 ```env
 NEXT_PUBLIC_SUPABASE_URL=https://xxx.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=xxx
-SUPABASE_SERVICE_ROLE_KEY=xxx  # Server-side only, never expose!
+SUPABASE_SERVICE_ROLE_KEY=xxx    # Server-side only
 NEXT_PUBLIC_SITE_URL=http://localhost:3000
+RESEND_API_KEY=re_xxx            # For email functionality
 ```
 
-## Coding Conventions
+## Constants & Configuration
 
-### TypeScript
-- Use `as any` type assertion for Supabase queries to avoid complex typing issues
-- Define interfaces for all data structures
-- Use Zod schemas for runtime validation
-
-### Components
-- Use shadcn/ui components from `@/components/ui/`
-- Client components must have `'use client'` directive
-- Server components are default (no directive needed)
-
-### Styling
-- Use Tailwind CSS utility classes
-- Theme colors use oklch color space (hue 250 for blue theme)
-- Mobile-first responsive design
-
-### File Naming
-- Components: PascalCase (`UserActions.tsx`)
-- Utilities: kebab-case (`format-date.ts`)
-- Pages: lowercase (`page.tsx`)
-
-## Common Patterns
-
-### Server Actions
-```typescript
-// Use createSecureAction for protected operations
-import { createSecureAction, createAdminAction } from '@/lib/auth/secure-action'
-
-export const myAction = createAdminAction(
-  myZodSchema,
-  async (input, { user, supabase }) => {
-    // Implementation
-  }
-)
-```
-
-### Data Fetching (Server Components)
-```typescript
-import { createClient } from '@/lib/supabase/server'
-
-async function getData() {
-  const supabase = await createClient()
-  const { data, error } = await (supabase.from('table') as any)
-    .select('*')
-  return data
-}
-```
-
-### Client-side Operations
-```typescript
-'use client'
-import { createClient } from '@/lib/supabase/client'
-
-const supabase = createClient()
-const { data } = await supabase.from('table').select('*')
-```
-
-## Development Commands
-
-```bash
-npm run dev      # Start development server
-npm run build    # Production build
-npm run lint     # Run ESLint
-npx tsc --noEmit # Type check
-```
-
-## Deployment Checklist
-
-1. Set all environment variables on hosting platform
-2. Update Supabase Auth settings:
-   - Site URL: `https://your-domain.com`
-   - Redirect URLs: `https://your-domain.com/**`
-3. Keep `SUPABASE_SERVICE_ROLE_KEY` server-side only
-4. Enable HTTPS
-
-## Notes for AI Assistants
-
-- Always use `as any` for Supabase queries to avoid type errors
-- The profiles table syncs automatically with auth.users
-- Check `src/lib/utils/constants.ts` for navigation items
-- Toast notifications use `sonner` library
-- Forms use controlled components with React state
+- Navigation items: `src/lib/utils/constants.ts`
+- Currency/formatting: `src/lib/utils/format.ts`
+- Validation schemas: `src/lib/validations/`

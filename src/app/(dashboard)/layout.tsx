@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import { usePathname } from 'next/navigation'
 import { Sidebar } from '@/components/layout/sidebar'
 import { DashboardHeader } from '@/components/layout/dashboard-header'
 import { Sheet, SheetContent, SheetTitle } from '@/components/ui/sheet'
@@ -11,8 +12,16 @@ export default function DashboardLayout({
 }: {
   children: React.ReactNode
 }) {
+  const pathname = usePathname()
   const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
+
+  // Customer pages don't need sidebar - they use public header
+  const isCustomerRoute = pathname.startsWith('/customer')
+
+  if (isCustomerRoute) {
+    return <>{children}</>
+  }
 
   return (
     <div className="flex h-screen overflow-hidden">

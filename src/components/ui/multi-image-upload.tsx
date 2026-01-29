@@ -16,6 +16,63 @@ interface MultiImageUploadProps {
   folder?: string
 }
 
+// Image preview component
+function ImagePreview({
+  url,
+  index,
+  onRemove,
+  isMain
+}: {
+  url: string
+  index: number
+  onRemove: () => void
+  isMain: boolean
+}) {
+  const [loaded, setLoaded] = useState(false)
+  const [error, setError] = useState(false)
+
+  return (
+    <div className="relative group aspect-square rounded-lg border overflow-hidden bg-muted">
+      {!error ? (
+        <>
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={url}
+            alt={`Image ${index + 1}`}
+            className={`absolute inset-0 w-full h-full object-cover transition-opacity ${loaded ? 'opacity-100' : 'opacity-0'}`}
+            onLoad={() => setLoaded(true)}
+            onError={() => setError(true)}
+          />
+          {!loaded && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+            </div>
+          )}
+        </>
+      ) : (
+        <div className="absolute inset-0 flex flex-col items-center justify-center text-muted-foreground">
+          <ImageIcon className="h-6 w-6 mb-1" />
+          <span className="text-[10px]">Failed</span>
+        </div>
+      )}
+      <Button
+        type="button"
+        variant="destructive"
+        size="icon"
+        className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity z-10"
+        onClick={onRemove}
+      >
+        <X className="h-3 w-3" />
+      </Button>
+      {isMain && (
+        <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded z-10">
+          Main
+        </span>
+      )}
+    </div>
+  )
+}
+
 export function MultiImageUpload({
   value = [],
   onChange,
@@ -136,30 +193,13 @@ export function MultiImageUpload({
       {value.length > 0 && (
         <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 gap-2">
           {value.map((url, index) => (
-            <div key={index} className="relative group aspect-square">
-              <img
-                src={url}
-                alt={`Product ${index + 1}`}
-                className="w-full h-full object-cover rounded-lg border"
-                onError={(e) => {
-                  (e.target as HTMLImageElement).src = '/placeholder.png'
-                }}
-              />
-              <Button
-                type="button"
-                variant="destructive"
-                size="icon"
-                className="absolute top-1 right-1 h-6 w-6 opacity-0 group-hover:opacity-100 transition-opacity"
-                onClick={() => handleRemove(index)}
-              >
-                <X className="h-3 w-3" />
-              </Button>
-              {index === 0 && (
-                <span className="absolute bottom-1 left-1 bg-primary text-primary-foreground text-xs px-1.5 py-0.5 rounded">
-                  Main
-                </span>
-              )}
-            </div>
+            <ImagePreview
+              key={`${url}-${index}`}
+              url={url}
+              index={index}
+              onRemove={() => handleRemove(index)}
+              isMain={index === 0}
+            />
           ))}
         </div>
       )}

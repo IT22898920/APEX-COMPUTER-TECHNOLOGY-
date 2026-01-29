@@ -44,6 +44,13 @@ interface PaymentReceipt {
   created_at: string
 }
 
+interface CustomerProfile {
+  id: string
+  full_name: string | null
+  phone: string | null
+  address: string | null
+}
+
 interface Order {
   id: string
   order_number: string
@@ -63,6 +70,7 @@ interface Order {
   updated_at: string
   order_items: OrderItem[]
   payment_receipts: PaymentReceipt[]
+  customer_profile?: CustomerProfile
 }
 
 async function getOrder(id: string): Promise<Order | null> {
@@ -96,6 +104,19 @@ async function getOrder(id: string): Promise<Order | null> {
   if (error) {
     console.error('Error fetching order:', error)
     return null
+  }
+
+  // Also fetch customer's current profile data
+  if (data?.customer_id) {
+    const { data: profile, error: profileError } = await (supabase as any)
+      .from('profiles')
+      .select('id, full_name, phone, address')
+      .eq('id', data.customer_id)
+      .single()
+
+    if (profile && !profileError) {
+      data.customer_profile = profile
+    }
   }
 
   return data as Order
@@ -306,39 +327,70 @@ export default async function AdminOrderDetailPage({
               </CardTitle>
             </CardHeader>
             <CardContent className="space-y-3">
-              <div className="flex items-center gap-2">
-                <User className="h-4 w-4 text-muted-foreground" />
-                <span>{order.customer_name}</span>
-              </div>
-              <div className="flex items-center gap-2">
-                <Mail className="h-4 w-4 text-muted-foreground" />
-                <a href={`mailto:${order.customer_email}`} className="text-primary hover:underline">
-                  {order.customer_email}
-                </a>
-              </div>
-              {order.customer_phone && (
-                <div className="flex items-center gap-2">
-                  <Phone className="h-4 w-4 text-muted-foreground" />
-                  <a href={`tel:${order.customer_phone}`} className="text-primary hover:underline">
-                    {order.customer_phone}
-                  </a>
-                </div>
-              )}
-              <Separator />
-              <Button
-                variant="outline"
-                className="w-full bg-[#25D366]/10 border-[#25D366] text-[#128C7E]"
-                asChild
-              >
-                <a
-                  href={`https://wa.me/${order.customer_phone?.replace(/\D/g, '')}?text=Hi ${order.customer_name}, regarding your order ${order.order_number}...`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                >
-                  <MessageCircle className="mr-2 h-4 w-4" />
-                  WhatsApp Customer
-                </a>
-              </Button>
+              {/* Use profile data if available, fallback to order data */}
+              {(() => {
+                // Profile has the most up-to-date data
+                const customerName = order.customer_profile?.full_name || order.customer_name
+                const customerEmail = order.customer_email // Email from order (profiles doesn't have email)
+                const customerPhone = order.customer_profile?.phone || order.customer_phone
+                const hasValidName = customerName && customerName !== customerEmail && customerName !== 'Customer Name'
+
+                return (
+                  <>
+                    <div className="flex items-center gap-2">
+                      <User className="h-4 w-4 text-muted-foreground" />
+                      <span className={!hasValidName ? 'text-muted-foreground italic text-sm' : 'font-medium'}>
+                        {hasValidName ? customerName : '(No name set)'}
+                      </span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Mail className="h-4 w-4 text-muted-foreground" />
+                      <a href={`mailto:${customerEmail}`} className="text-primary hover:underline text-sm break-all">
+                        {customerEmail}
+                      </a>
+                    </div>
+                    {customerPhone ? (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <a href={`tel:${customerPhone}`} className="text-primary hover:underline">
+                          {customerPhone}
+                        </a>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-2">
+                        <Phone className="h-4 w-4 text-muted-foreground" />
+                        <span className="text-muted-foreground italic text-sm">(No phone)</span>
+                      </div>
+                    )}
+                    <Separator />
+                    {customerPhone ? (
+                      <Button
+                        variant="outline"
+                        className="w-full bg-[#25D366]/10 border-[#25D366] text-[#128C7E]"
+                        asChild
+                      >
+                        <a
+                          href={`https://wa.me/${customerPhone.replace(/\D/g, '')}?text=Hi ${hasValidName ? customerName + ', ' : ''}regarding your order ${order.order_number}...`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                        >
+                          <MessageCircle className="mr-2 h-4 w-4" />
+                          WhatsApp Customer
+                        </a>
+                      </Button>
+                    ) : (
+                      <Button
+                        variant="outline"
+                        className="w-full"
+                        disabled
+                      >
+                        <MessageCircle className="mr-2 h-4 w-4" />
+                        No Phone Number
+                      </Button>
+                    )}
+                  </>
+                )
+              })()}
             </CardContent>
           </Card>
 

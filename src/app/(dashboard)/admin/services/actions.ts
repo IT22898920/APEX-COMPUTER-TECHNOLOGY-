@@ -10,6 +10,7 @@ export interface Service {
   description: string
   icon: string
   image_url: string | null
+  images: string[]
   features: string[]
   price_from: number | null
   price_to: number | null
@@ -72,6 +73,7 @@ export async function createService(data: {
   description: string
   icon?: string
   image_url?: string
+  images?: string[]
   features?: string[]
   price_from?: number | null
   price_to?: number | null
@@ -89,7 +91,8 @@ export async function createService(data: {
         slug: data.slug,
         description: data.description,
         icon: data.icon || 'Wrench',
-        image_url: data.image_url || null,
+        image_url: data.images?.[0] || data.image_url || null,
+        images: data.images || [],
         features: data.features || [],
         price_from: data.price_from || null,
         price_to: data.price_to || null,
@@ -121,6 +124,7 @@ export async function updateService(id: string, data: {
   description?: string
   icon?: string
   image_url?: string | null
+  images?: string[]
   features?: string[]
   price_from?: number | null
   price_to?: number | null
@@ -131,9 +135,15 @@ export async function updateService(id: string, data: {
   try {
     const supabase = createAdminClient()
 
+    // If images array is provided, also update image_url with first image
+    const updateData = { ...data }
+    if (data.images !== undefined) {
+      updateData.image_url = data.images[0] || null
+    }
+
     const { error } = await supabase
       .from('services')
-      .update(data)
+      .update(updateData)
       .eq('id', id)
 
     if (error) {

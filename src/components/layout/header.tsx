@@ -3,7 +3,7 @@
 import Link from 'next/link'
 import Image from 'next/image'
 import { useState } from 'react'
-import { Menu, Phone, Mail, LogOut, LayoutDashboard, User } from 'lucide-react'
+import { Menu, Phone, Mail, LogOut, LayoutDashboard, User, ShoppingBag } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Sheet, SheetContent, SheetTrigger, SheetTitle } from '@/components/ui/sheet'
 import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar'
@@ -125,6 +125,12 @@ export function Header() {
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
+                    <Link href={`${dashboardUrl}/orders`}>
+                      <ShoppingBag className="mr-2 h-4 w-4" />
+                      My Orders
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
                     <Link href={`${dashboardUrl}/profile`}>
                       <User className="mr-2 h-4 w-4" />
                       Profile
@@ -177,6 +183,12 @@ export function Header() {
                       <Link href={dashboardUrl} onClick={() => setIsOpen(false)}>
                         <LayoutDashboard className="mr-2 h-4 w-4" />
                         Dashboard
+                      </Link>
+                    </Button>
+                    <Button asChild variant="outline" className="w-full">
+                      <Link href={`${dashboardUrl}/orders`} onClick={() => setIsOpen(false)}>
+                        <ShoppingBag className="mr-2 h-4 w-4" />
+                        My Orders
                       </Link>
                     </Button>
                     <Button asChild variant="outline" className="w-full">

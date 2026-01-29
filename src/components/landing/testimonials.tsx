@@ -192,7 +192,7 @@ export function Testimonials() {
         <div className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-4 sm:gap-8 max-w-3xl mx-auto px-4 sm:px-0">
           {[
             { value: '500+', label: 'Happy Clients' },
-            { value: '10+', label: 'Years Experience' },
+            { value: '15+', label: 'Years Experience' },
             { value: '98%', label: 'Satisfaction Rate' },
             { value: '24/7', label: 'Support Available' },
           ].map((stat) => (

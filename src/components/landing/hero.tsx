@@ -3,14 +3,15 @@
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
-import { ArrowRight, Clock, Shield, Users, Zap, Sparkles, CheckCircle2, Laptop, Monitor, Printer, Server } from 'lucide-react'
+import { ArrowRight, Clock, Shield, Users, Zap, Sparkles, CheckCircle2, Laptop, Monitor, Printer, Server, MessageCircle } from 'lucide-react'
 import { Button } from '@/components/ui/button'
+import { COMPANY_INFO } from '@/lib/utils/constants'
 
 const stats = [
   { icon: Users, value: '500+', label: 'Happy Clients' },
   { icon: Clock, value: '2-3hr', label: 'Response Time' },
-  { icon: Shield, value: '10+', label: 'Years Experience' },
-  { icon: Zap, value: '98%', label: 'Uptime Guarantee' },
+  { icon: Shield, value: '15+', label: 'Years Experience' },
+  { icon: Zap, value: '24/7', label: 'Support Available' },
 ]
 
 const floatingItems = [
@@ -126,6 +127,20 @@ export function Hero() {
                 <Link href="/services">Our Services</Link>
               </Button>
             </div>
+
+            {/* WhatsApp Quick Contact */}
+            <div className="mt-6 flex items-center justify-center lg:justify-start gap-3">
+              <span className="text-sm text-slate-400">Quick Contact:</span>
+              <a
+                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent("Hi, I'm interested in your IT products and services.")}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 rounded-full text-[#25D366] text-sm font-medium transition-colors"
+              >
+                <MessageCircle className="h-4 w-4" />
+                WhatsApp Us
+              </a>
+            </div>
           </div>
 
           {/* Right Content - Featured Image/Visual */}
@@ -169,8 +184,8 @@ export function Hero() {
                       <div className="text-white font-semibold">Free Consultation</div>
                       <div className="text-sm text-slate-400">Get expert advice today</div>
                     </div>
-                    <Button size="sm" variant="secondary" className="shrink-0">
-                      Contact Us
+                    <Button size="sm" variant="secondary" className="shrink-0" asChild>
+                      <Link href="/contact">Contact Us</Link>
                     </Button>
                   </div>
                 </div>

@@ -2,7 +2,8 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
-import { Loader2 } from 'lucide-react'
+import { Loader2, FileText, Eye } from 'lucide-react'
+import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Label } from '@/components/ui/label'
 import {
@@ -14,7 +15,7 @@ import {
 } from '@/components/ui/select'
 import { Separator } from '@/components/ui/separator'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
+import { updateOrderStatus, sendInvoiceEmail } from './actions'
 
 interface OrderStatusActionsProps {
   orderId: string
@@ -47,29 +48,28 @@ export function OrderStatusActions({
   const [status, setStatus] = useState(currentStatus)
   const [paymentStatus, setPaymentStatus] = useState(currentPaymentStatus)
   const [isUpdating, setIsUpdating] = useState(false)
+  const [isSendingInvoice, setIsSendingInvoice] = useState(false)
 
   const handleUpdate = async () => {
     setIsUpdating(true)
 
-    const supabase = createClient()
+    const hasStatusChange = status !== currentStatus
+    const hasPaymentChange = paymentStatus !== currentPaymentStatus
 
-    const updates: Record<string, string> = {}
-    if (status !== currentStatus) updates.status = status
-    if (paymentStatus !== currentPaymentStatus) updates.payment_status = paymentStatus
-
-    if (Object.keys(updates).length === 0) {
+    if (!hasStatusChange && !hasPaymentChange) {
       toast.info('No changes to save')
       setIsUpdating(false)
       return
     }
 
-    const { error } = await (supabase as any)
-      .from('orders')
-      .update(updates)
-      .eq('id', orderId)
+    const result = await updateOrderStatus({
+      orderId,
+      status: hasStatusChange ? status : undefined,
+      paymentStatus: hasPaymentChange ? paymentStatus : undefined,
+    })
 
-    if (error) {
-      toast.error('Failed to update order', { description: error.message })
+    if (!result.success) {
+      toast.error('Failed to update order', { description: result.error })
     } else {
       toast.success('Order updated successfully')
       router.refresh()
@@ -79,6 +79,22 @@ export function OrderStatusActions({
   }
 
   const hasChanges = status !== currentStatus || paymentStatus !== currentPaymentStatus
+
+  const handleSendInvoice = async () => {
+    setIsSendingInvoice(true)
+
+    const result = await sendInvoiceEmail(orderId)
+
+    if (!result.success) {
+      toast.error('Failed to send invoice', { description: result.error })
+    } else {
+      toast.success('Invoice sent!', {
+        description: `Invoice sent to ${result.customerEmail}`,
+      })
+    }
+
+    setIsSendingInvoice(false)
+  }
 
   return (
     <div className="space-y-4">
@@ -130,6 +146,42 @@ export function OrderStatusActions({
           'Save Changes'
         )}
       </Button>
+
+      <Separator />
+
+      <div className="space-y-2">
+        <p className="text-sm font-medium text-muted-foreground">Invoice</p>
+        <div className="grid grid-cols-2 gap-2">
+          <Button
+            variant="outline"
+            size="sm"
+            asChild
+          >
+            <Link href={`/admin/orders/${orderId}/invoice`} target="_blank">
+              <Eye className="mr-2 h-4 w-4" />
+              View
+            </Link>
+          </Button>
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={handleSendInvoice}
+            disabled={isSendingInvoice}
+          >
+            {isSendingInvoice ? (
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Sending...
+              </>
+            ) : (
+              <>
+                <FileText className="mr-2 h-4 w-4" />
+                Send
+              </>
+            )}
+          </Button>
+        </div>
+      </div>
     </div>
   )
 }

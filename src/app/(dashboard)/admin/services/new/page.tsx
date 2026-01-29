@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
-import { ArrowLeft, Loader2, Plus, X } from 'lucide-react'
+import { ArrowLeft, Loader2, Plus, X, ImageIcon } from 'lucide-react'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/select'
 import { toast } from 'sonner'
 import { createService } from '../actions'
+import { MultiImageUpload } from '@/components/ui/multi-image-upload'
 
 // Available icons for services
 const AVAILABLE_ICONS = [
@@ -56,6 +57,7 @@ export default function NewServicePage() {
     description: '',
     icon: 'Monitor',
     features: [] as string[],
+    images: [] as string[],
     is_featured: true,
     is_active: true,
   })
@@ -103,6 +105,7 @@ export default function NewServicePage() {
       slug: formData.slug || generateSlug(formData.title),
       description: formData.description,
       icon: formData.icon,
+      images: formData.images,
       features: formData.features,
       is_featured: formData.is_featured,
       is_active: formData.is_active,
@@ -193,6 +196,18 @@ export default function NewServicePage() {
                   ))}
                 </SelectContent>
               </Select>
+            </div>
+
+            {/* Service Images */}
+            <div className="space-y-2">
+              <Label>Service Images</Label>
+              <MultiImageUpload
+                value={formData.images}
+                onChange={(urls) => setFormData({ ...formData, images: urls })}
+                maxImages={5}
+                bucket="product-images"
+                folder="services"
+              />
             </div>
 
             {/* Features */}

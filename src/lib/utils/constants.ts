@@ -10,10 +10,10 @@ export const COMPANY_INFO = {
   phone: '+94 77 777 0003',
   whatsapp: '+94777770003', // Without spaces for WhatsApp API
   whatsappDisplay: '+94 77 777 0003',
-  email: 'info@apextech.lk',
+  email: 'apex@isplanka.lk',
   address: {
-    street: '123 Main Street',
-    city: 'Colombo',
+    street: '#236/15, Wijayakumarathunga Mawatha',
+    city: 'Colombo 05',
     country: 'Sri Lanka',
   },
   workingHours: 'Mon - Fri: 8:00 AM - 6:00 PM',
@@ -142,12 +142,10 @@ export const PUBLIC_NAV_ITEMS = [
 export const ADMIN_NAV_ITEMS = [
   { title: 'Dashboard', href: '/admin', icon: 'LayoutDashboard' },
   { title: 'Users', href: '/admin/users', icon: 'Users' },
-  { title: 'Tickets', href: '/admin/tickets', icon: 'Ticket' },
   { title: 'Categories', href: '/admin/categories', icon: 'FolderTree' },
   { title: 'Services', href: '/admin/services', icon: 'Briefcase' },
   { title: 'Products', href: '/admin/products', icon: 'Package' },
   { title: 'Orders', href: '/admin/orders', icon: 'ShoppingCart' },
-  { title: 'Agreements', href: '/admin/agreements', icon: 'FileText' },
   { title: 'Reports', href: '/admin/reports', icon: 'BarChart3' },
   { title: 'Bank Accounts', href: '/admin/settings/bank-accounts', icon: 'Building2' },
   { title: 'Settings', href: '/admin/settings', icon: 'Settings' },
@@ -156,7 +154,7 @@ export const ADMIN_NAV_ITEMS = [
 export const STAFF_NAV_ITEMS = {
   technician: [
     { title: 'Dashboard', href: '/staff', icon: 'LayoutDashboard' },
-    { title: 'My Tickets', href: '/staff/tickets', icon: 'Ticket' },
+    { title: 'Orders', href: '/staff/orders', icon: 'ShoppingCart' },
   ],
   marketing: [
     { title: 'Dashboard', href: '/staff', icon: 'LayoutDashboard' },
@@ -165,7 +163,6 @@ export const STAFF_NAV_ITEMS = {
   ],
   support: [
     { title: 'Dashboard', href: '/staff', icon: 'LayoutDashboard' },
-    { title: 'Tickets', href: '/staff/tickets', icon: 'Ticket' },
     { title: 'Inventory', href: '/staff/inventory', icon: 'Package' },
     { title: 'Orders', href: '/staff/orders', icon: 'ShoppingCart' },
   ],
@@ -173,9 +170,7 @@ export const STAFF_NAV_ITEMS = {
 
 export const CUSTOMER_NAV_ITEMS = [
   { title: 'Dashboard', href: '/customer', icon: 'LayoutDashboard' },
-  { title: 'Service Requests', href: '/customer/service-requests', icon: 'Ticket' },
-  { title: 'My Agreements', href: '/customer/agreements', icon: 'FileText' },
-  { title: 'Service History', href: '/customer/history', icon: 'History' },
+  { title: 'My Orders', href: '/customer/orders', icon: 'ShoppingCart' },
   { title: 'Profile', href: '/customer/profile', icon: 'User' },
 ] as const
 

@@ -4,7 +4,6 @@ import { CategoriesShowcase } from '@/components/landing/categories-showcase'
 import { WhyChooseUs } from '@/components/landing/why-choose-us'
 import { ServicesSection } from '@/components/landing/services-section'
 import { Testimonials } from '@/components/landing/testimonials'
-import { AgreementsSection } from '@/components/landing/agreements-section'
 import { CTASection } from '@/components/landing/cta-section'
 
 export default function HomePage() {
@@ -27,9 +26,6 @@ export default function HomePage() {
 
       {/* Testimonials - Social proof */}
       <Testimonials />
-
-      {/* Service Agreement Plans - For businesses */}
-      <AgreementsSection />
 
       {/* CTA - Final call to action */}
       <CTASection />

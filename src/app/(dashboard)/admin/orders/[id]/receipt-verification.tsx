@@ -11,6 +11,8 @@ import {
   Calendar,
   Hash,
   DollarSign,
+  FileText,
+  MessageCircle,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
@@ -24,8 +26,8 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog'
 import { toast } from 'sonner'
-import { createClient } from '@/lib/supabase/client'
 import { formatCurrency } from '@/lib/utils/format'
+import { verifyReceipt, rejectReceipt } from './actions'
 
 interface PaymentReceipt {
   id: string
@@ -48,7 +50,13 @@ export function ReceiptVerification({ receipt, orderId }: ReceiptVerificationPro
   const [isVerifying, setIsVerifying] = useState(false)
   const [isRejecting, setIsRejecting] = useState(false)
   const [showRejectDialog, setShowRejectDialog] = useState(false)
+  const [showWhatsAppDialog, setShowWhatsAppDialog] = useState(false)
   const [rejectionReason, setRejectionReason] = useState('')
+  const [whatsAppData, setWhatsAppData] = useState<{
+    phone: string
+    message: string
+    type: 'verified' | 'rejected'
+  } | null>(null)
 
   const formatDate = (date: string) => {
     return new Date(date).toLocaleDateString('en-US', {
@@ -61,28 +69,25 @@ export function ReceiptVerification({ receipt, orderId }: ReceiptVerificationPro
   const handleVerify = async () => {
     setIsVerifying(true)
 
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const result = await verifyReceipt({
+      receiptId: receipt.id,
+      orderId,
+    })
 
-    const { error } = await (supabase as any)
-      .from('payment_receipts')
-      .update({
-        status: 'verified',
-        verified_by: user?.id,
-        verified_at: new Date().toISOString(),
-      })
-      .eq('id', receipt.id)
-
-    if (error) {
-      toast.error('Failed to verify receipt')
+    if (!result.success) {
+      toast.error(result.error || 'Failed to verify receipt')
     } else {
-      toast.success('Receipt verified successfully')
+      toast.success('Receipt verified! Email sent to customer.')
 
-      // Update order payment status to paid
-      await (supabase as any)
-        .from('orders')
-        .update({ payment_status: 'paid' })
-        .eq('id', orderId)
+      // Show WhatsApp option if phone number exists
+      if (result.customerPhone) {
+        setWhatsAppData({
+          phone: result.customerPhone.replace(/\D/g, ''),
+          message: `Hi ${result.customerName}! Great news - your payment for order #${result.orderNumber} has been verified. Your order is now being processed. Thank you for shopping with APEX Computer Technology!`,
+          type: 'verified',
+        })
+        setShowWhatsAppDialog(true)
+      }
 
       router.refresh()
     }
@@ -98,24 +103,28 @@ export function ReceiptVerification({ receipt, orderId }: ReceiptVerificationPro
 
     setIsRejecting(true)
 
-    const supabase = createClient()
-    const { data: { user } } = await supabase.auth.getUser()
+    const result = await rejectReceipt({
+      receiptId: receipt.id,
+      orderId,
+      rejectionReason,
+    })
 
-    const { error } = await (supabase as any)
-      .from('payment_receipts')
-      .update({
-        status: 'rejected',
-        rejection_reason: rejectionReason,
-        verified_by: user?.id,
-        verified_at: new Date().toISOString(),
-      })
-      .eq('id', receipt.id)
-
-    if (error) {
-      toast.error('Failed to reject receipt')
+    if (!result.success) {
+      toast.error(result.error || 'Failed to reject receipt')
     } else {
-      toast.success('Receipt rejected')
+      toast.success('Receipt rejected. Email sent to customer.')
       setShowRejectDialog(false)
+
+      // Show WhatsApp option if phone number exists
+      if (result.customerPhone) {
+        setWhatsAppData({
+          phone: result.customerPhone.replace(/\D/g, ''),
+          message: `Hi ${result.customerName}, regarding your order #${result.orderNumber} - we couldn't verify your payment receipt. Reason: ${rejectionReason}. Please upload a clear receipt or contact us for assistance. - APEX Computer Technology`,
+          type: 'rejected',
+        })
+        setShowWhatsAppDialog(true)
+      }
+
       router.refresh()
     }
 
@@ -168,7 +177,7 @@ export function ReceiptVerification({ receipt, orderId }: ReceiptVerificationPro
           </Button>
         </div>
 
-        {/* Receipt Image Preview */}
+        {/* Receipt Preview */}
         {receipt.receipt_url && (
           <a
             href={receipt.receipt_url}
@@ -176,11 +185,30 @@ export function ReceiptVerification({ receipt, orderId }: ReceiptVerificationPro
             rel="noopener noreferrer"
             className="block"
           >
-            <img
-              src={receipt.receipt_url}
-              alt="Payment receipt"
-              className="w-full max-h-48 object-contain bg-muted rounded-lg"
-            />
+            {receipt.receipt_url.toLowerCase().endsWith('.pdf') ? (
+              <div className="w-full h-32 bg-muted rounded-lg flex flex-col items-center justify-center gap-2 hover:bg-muted/80 transition-colors">
+                <FileText className="h-12 w-12 text-red-500" />
+                <span className="text-sm text-muted-foreground">Click to view PDF</span>
+              </div>
+            ) : (
+              <img
+                src={receipt.receipt_url}
+                alt="Payment receipt"
+                className="w-full max-h-48 object-contain bg-muted rounded-lg"
+                onError={(e) => {
+                  const target = e.target as HTMLImageElement
+                  target.style.display = 'none'
+                  target.parentElement!.innerHTML = `
+                    <div class="w-full h-32 bg-muted rounded-lg flex flex-col items-center justify-center gap-2">
+                      <svg class="h-12 w-12 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+                      </svg>
+                      <span class="text-sm text-muted-foreground">Click to view file</span>
+                    </div>
+                  `
+                }}
+              />
+            )}
           </a>
         )}
 
@@ -267,6 +295,47 @@ export function ReceiptVerification({ receipt, orderId }: ReceiptVerificationPro
               ) : (
                 'Reject Receipt'
               )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* WhatsApp Notification Dialog */}
+      <Dialog open={showWhatsAppDialog} onOpenChange={setShowWhatsAppDialog}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <MessageCircle className="h-5 w-5 text-[#25D366]" />
+              Send WhatsApp Message?
+            </DialogTitle>
+            <DialogDescription>
+              Email notification sent! Would you also like to notify the customer via WhatsApp?
+            </DialogDescription>
+          </DialogHeader>
+          {whatsAppData && (
+            <div className="bg-muted p-3 rounded-lg text-sm">
+              <p className="text-muted-foreground mb-1">Message preview:</p>
+              <p>{whatsAppData.message}</p>
+            </div>
+          )}
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setShowWhatsAppDialog(false)}>
+              Skip
+            </Button>
+            <Button
+              className="bg-[#25D366] hover:bg-[#128C7E]"
+              onClick={() => {
+                if (whatsAppData) {
+                  window.open(
+                    `https://wa.me/${whatsAppData.phone}?text=${encodeURIComponent(whatsAppData.message)}`,
+                    '_blank'
+                  )
+                }
+                setShowWhatsAppDialog(false)
+              }}
+            >
+              <MessageCircle className="h-4 w-4 mr-2" />
+              Open WhatsApp
             </Button>
           </DialogFooter>
         </DialogContent>

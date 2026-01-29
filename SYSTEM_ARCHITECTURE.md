@@ -1602,7 +1602,7 @@ CREATE TRIGGER trigger_log_ticket_changes
 │ │  Your trusted IT         About             Networking      Colombo, LK     │ │
 │ │  solutions partner       Products          Software                        │ │
 │ │                          Portal            Sales           +94 XX XXX XXX  │ │
-│ │  [Social Media Icons]                                      info@apex.lk    │ │
+│ │  [Social Media Icons]                                      apex@isplanka.lk    │ │
 │ │                                                                             │ │
 │ │  ────────────────────────────────────────────────────────────────────────  │ │
 │ │  © 2024 Apex Computer Technology. All rights reserved.                     │ │

@@ -2,6 +2,8 @@
 
 import { createClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { sendEmail } from '@/lib/email/resend'
+import { generateOrderConfirmationEmail } from '@/lib/email/templates/order-confirmation'
 
 interface InquiryItem {
   id: string
@@ -80,6 +82,51 @@ export async function submitInquiry(input: SubmitInquiryInput) {
     // Delete the order if items failed
     await (supabase as any).from('orders').delete().eq('id', order.id)
     return { success: false, error: 'Failed to create order items' }
+  }
+
+  // Get bank accounts for email
+  const bankAccounts = await getBankAccounts()
+
+  // Send order confirmation email
+  const emailItems = input.items.map((item) => ({
+    name: item.name,
+    sku: item.sku,
+    quantity: item.quantity,
+    unit_price: item.price,
+    total_price: item.price * item.quantity,
+  }))
+
+  const emailHtml = generateOrderConfirmationEmail({
+    orderNumber: order.order_number,
+    orderId: order.id,
+    customerName: profile?.full_name || user.email || 'Customer',
+    items: emailItems,
+    subtotal,
+    total,
+    notes: input.customerNotes,
+    bankAccounts: bankAccounts.map((acc: any) => ({
+      bank_name: acc.bank_name,
+      account_name: acc.account_name,
+      account_number: acc.account_number,
+      branch: acc.branch,
+      is_primary: acc.is_primary,
+    })),
+  })
+
+  // Send email (don't block order completion if email fails)
+  console.log('[Order] Sending confirmation email to:', user.email)
+
+  // Await the email to ensure it's sent before the function returns
+  const emailResult = await sendEmail({
+    to: user.email!,
+    subject: `Order Confirmation - ${order.order_number} | APEX Computer Technology`,
+    html: emailHtml,
+  })
+
+  if (!emailResult.success) {
+    console.error('[Order] Failed to send confirmation email:', emailResult.error)
+  } else {
+    console.log('[Order] Confirmation email sent successfully')
   }
 
   revalidatePath('/customer')

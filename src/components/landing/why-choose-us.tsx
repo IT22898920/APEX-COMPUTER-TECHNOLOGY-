@@ -27,7 +27,7 @@ const features = [
   },
   {
     icon: BadgeCheck,
-    title: '10+ Years Experience',
+    title: '15+ Years Experience',
     description: 'Trusted IT partner for businesses across Sri Lanka',
     color: 'from-pink-500 to-rose-500',
   },

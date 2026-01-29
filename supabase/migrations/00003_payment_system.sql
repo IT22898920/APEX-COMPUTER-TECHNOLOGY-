@@ -73,7 +73,8 @@ CREATE POLICY "Anyone can view active bank accounts"
 DROP POLICY IF EXISTS "Admin manage bank accounts" ON bank_accounts;
 CREATE POLICY "Admin manage bank accounts"
   ON bank_accounts FOR ALL
-  USING (is_admin());
+  USING (is_admin())
+  WITH CHECK (is_admin());
 
 -- =====================
 -- PAYMENT RECEIPTS POLICIES

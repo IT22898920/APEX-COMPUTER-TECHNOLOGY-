@@ -30,7 +30,12 @@
       "Bash(dir \"C:\\\\Users\\\\DELL\\\\Pictures\" /b)",
       "Bash(rm:*)",
       "Bash(node scripts/add-products.mjs:*)",
-      "Bash(node scripts/add-product-images.mjs:*)"
+      "Bash(node scripts/add-product-images.mjs:*)",
+      "Bash(curl:*)",
+      "Bash(node scripts/add-service-images.mjs:*)",
+      "Bash(node scripts/setup-reports.mjs:*)",
+      "Bash(node scripts/setup-signatures.mjs:*)",
+      "Bash(wc:*)"
     ]
   }
 }
