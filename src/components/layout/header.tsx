@@ -93,12 +93,15 @@ export function Header() {
 
           {isAuthenticated ? (
             <>
-              <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
-                <Link href={dashboardUrl}>
-                  <LayoutDashboard className="mr-2 h-4 w-4" />
-                  Dashboard
-                </Link>
-              </Button>
+              {/* Dashboard button only for admin/staff */}
+              {(isAdmin || isStaff) && (
+                <Button variant="ghost" size="sm" asChild className="hidden sm:inline-flex">
+                  <Link href={dashboardUrl}>
+                    <LayoutDashboard className="mr-2 h-4 w-4" />
+                    Dashboard
+                  </Link>
+                </Button>
+              )}
               <DropdownMenu>
                 <DropdownMenuTrigger asChild>
                   <Button variant="ghost" size="icon" className="rounded-full">
@@ -118,12 +121,15 @@ export function Header() {
                     </div>
                   </DropdownMenuLabel>
                   <DropdownMenuSeparator />
-                  <DropdownMenuItem asChild>
-                    <Link href={dashboardUrl}>
-                      <LayoutDashboard className="mr-2 h-4 w-4" />
-                      Dashboard
-                    </Link>
-                  </DropdownMenuItem>
+                  {/* Dashboard only for admin/staff */}
+                  {(isAdmin || isStaff) && (
+                    <DropdownMenuItem asChild>
+                      <Link href={dashboardUrl}>
+                        <LayoutDashboard className="mr-2 h-4 w-4" />
+                        Dashboard
+                      </Link>
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem asChild>
                     <Link href={`${dashboardUrl}/orders`}>
                       <ShoppingBag className="mr-2 h-4 w-4" />
@@ -179,12 +185,15 @@ export function Header() {
                 <hr className="my-4" />
                 {isAuthenticated ? (
                   <>
-                    <Button asChild className="w-full">
-                      <Link href={dashboardUrl} onClick={() => setIsOpen(false)}>
-                        <LayoutDashboard className="mr-2 h-4 w-4" />
-                        Dashboard
-                      </Link>
-                    </Button>
+                    {/* Dashboard only for admin/staff */}
+                    {(isAdmin || isStaff) && (
+                      <Button asChild className="w-full">
+                        <Link href={dashboardUrl} onClick={() => setIsOpen(false)}>
+                          <LayoutDashboard className="mr-2 h-4 w-4" />
+                          Dashboard
+                        </Link>
+                      </Button>
+                    )}
                     <Button asChild variant="outline" className="w-full">
                       <Link href={`${dashboardUrl}/orders`} onClick={() => setIsOpen(false)}>
                         <ShoppingBag className="mr-2 h-4 w-4" />
