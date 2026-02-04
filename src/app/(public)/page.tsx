@@ -1,34 +1,26 @@
-import { Hero } from '@/components/landing/hero'
-import { FeaturedProducts } from '@/components/landing/featured-products'
-import { CategoriesShowcase } from '@/components/landing/categories-showcase'
-import { WhyChooseUs } from '@/components/landing/why-choose-us'
-import { ServicesSection } from '@/components/landing/services-section'
+import { HomeV2 } from '@/components/landing/home-v2'
+import { ProductsSectionV2 } from '@/components/landing/products-section-v2'
+import { ServicesSectionV2 } from '@/components/landing/services-section-v2'
 import { Testimonials } from '@/components/landing/testimonials'
-import { CTASection } from '@/components/landing/cta-section'
+import { CTASectionV2 } from '@/components/landing/cta-section-v2'
 
 export default function HomePage() {
   return (
     <>
-      {/* Hero - First impression with animated visuals */}
-      <Hero />
+      {/* Hero + Features from HomeV2 */}
+      <HomeV2 />
 
-      {/* Featured Products - Show products immediately to drive sales */}
-      <FeaturedProducts />
+      {/* Real Products from Database */}
+      <ProductsSectionV2 />
 
-      {/* Categories - Easy navigation to find products */}
-      <CategoriesShowcase />
+      {/* Real Services from Database */}
+      <ServicesSectionV2 />
 
-      {/* Why Choose Us - Build trust and credibility */}
-      <WhyChooseUs />
-
-      {/* Services - Show service offerings */}
-      <ServicesSection />
-
-      {/* Testimonials - Social proof */}
+      {/* Testimonials */}
       <Testimonials />
 
-      {/* CTA - Final call to action */}
-      <CTASection />
+      {/* Final CTA */}
+      <CTASectionV2 />
     </>
   )
 }

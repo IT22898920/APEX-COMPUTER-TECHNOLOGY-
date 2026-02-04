@@ -2,36 +2,37 @@
 
 import { useEffect, useState } from 'react'
 import Link from 'next/link'
-import Image from 'next/image'
-import { ArrowRight, Clock, Shield, Users, Zap, Sparkles, CheckCircle2, Laptop, Monitor, Printer, Server, MessageCircle } from 'lucide-react'
+import { motion } from 'framer-motion'
+import { ArrowRight, Sparkles, CheckCircle2, MessageCircle, Cpu, Wifi, HardDrive, Monitor } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { COMPANY_INFO } from '@/lib/utils/constants'
+import { GlitchText, FlipText } from '@/components/ui/glitch-text'
 import dynamic from 'next/dynamic'
 
-// Dynamically import 3D scene to avoid SSR issues
-const Hero3DScene = dynamic(() => import('./hero-3d-scene').then(mod => ({ default: mod.Hero3DScene })), {
+// Dynamic import for Three.js Light Pillar (client-only)
+const LightPillar3D = dynamic(() => import('@/components/ui/light-pillar-3d'), {
   ssr: false,
-  loading: () => null,
+  loading: () => null
+})
+
+// Dynamic import for Antigravity particles
+const Antigravity = dynamic(() => import('@/components/ui/antigravity'), {
+  ssr: false,
+  loading: () => null
 })
 
 const stats = [
-  { icon: Users, value: '500+', label: 'Happy Clients' },
-  { icon: Clock, value: '2-3hr', label: 'Response Time' },
-  { icon: Shield, value: '15+', label: 'Years Experience' },
-  { icon: Zap, value: '24/7', label: 'Support Available' },
+  { value: '500+', label: 'Happy Clients' },
+  { value: '2-3hr', label: 'Response Time' },
+  { value: '15+', label: 'Years Experience' },
+  { value: '24/7', label: 'Support' },
 ]
 
-const floatingItems = [
-  { icon: Laptop, delay: '0s', position: 'top-1/4 left-[15%]' },
-  { icon: Monitor, delay: '1s', position: 'top-1/3 right-[10%]' },
-  { icon: Printer, delay: '2s', position: 'bottom-1/3 left-[10%]' },
-  { icon: Server, delay: '0.5s', position: 'bottom-1/4 right-[15%]' },
-]
-
-const highlights = [
-  'Genuine Products with Warranty',
-  'Expert Technical Support',
-  'Fast Island-wide Delivery',
+const floatingIcons = [
+  { Icon: Cpu, x: '10%', y: '20%', delay: 0, size: 40 },
+  { Icon: Monitor, x: '85%', y: '15%', delay: 0.5, size: 48 },
+  { Icon: Wifi, x: '5%', y: '70%', delay: 1, size: 36 },
+  { Icon: HardDrive, x: '90%', y: '75%', delay: 1.5, size: 42 },
 ]
 
 export function Hero() {
@@ -42,218 +43,332 @@ export function Hero() {
   }, [])
 
   return (
-    <section className="relative min-h-[80vh] md:min-h-[90vh] flex items-center overflow-hidden bg-gradient-to-br from-slate-900 via-slate-800 to-slate-900">
-      {/* Animated gradient background */}
-      <div className="absolute inset-0 -z-10">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-primary/20 via-transparent to-transparent" />
-        <div className="absolute left-1/4 top-1/4 h-[500px] w-[500px] rounded-full bg-primary/30 blur-[120px] animate-pulse" />
-        <div className="absolute right-1/4 bottom-1/4 h-[400px] w-[400px] rounded-full bg-blue-500/20 blur-[100px] animate-pulse" style={{ animationDelay: '1s' }} />
-        <div className="absolute left-1/2 top-0 -translate-x-1/2 h-[300px] w-[800px] rounded-full bg-cyan-500/10 blur-[100px]" />
+    <section className="relative min-h-screen flex items-center justify-center overflow-hidden bg-[#0a0a0f]">
+      {/* Dramatic Animated Background */}
+      <div className="absolute inset-0 pointer-events-none">
+        {/* Large Gradient Orbs */}
+        <motion.div
+          className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] rounded-full bg-gradient-to-r from-blue-600/50 to-purple-600/50 blur-[100px]"
+          animate={{
+            scale: [1, 1.3, 1],
+            x: [0, 50, 0],
+            y: [0, 30, 0],
+          }}
+          transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] rounded-full bg-gradient-to-r from-cyan-500/40 to-blue-600/40 blur-[120px]"
+          animate={{
+            scale: [1.2, 1, 1.2],
+            x: [0, -50, 0],
+            y: [0, -30, 0],
+          }}
+          transition={{ duration: 10, repeat: Infinity, ease: 'easeInOut' }}
+        />
+        <motion.div
+          className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] rounded-full bg-gradient-to-r from-violet-500/30 to-fuchsia-500/30 blur-[80px]"
+          animate={{
+            scale: [1, 1.4, 1],
+            rotate: [0, 180, 360],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: 'linear' }}
+        />
+
+        {/* Scan Line Effect */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <motion.div
+            className="absolute left-0 right-0 h-[2px] bg-gradient-to-r from-transparent via-cyan-400/50 to-transparent"
+            animate={{ y: ['-100%', '100vh'] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'linear' }}
+          />
+        </div>
+
+        {/* Grid Pattern */}
+        <div
+          className="absolute inset-0 opacity-[0.03]"
+          style={{
+            backgroundImage: `
+              linear-gradient(to right, rgba(255,255,255,0.1) 1px, transparent 1px),
+              linear-gradient(to bottom, rgba(255,255,255,0.1) 1px, transparent 1px)
+            `,
+            backgroundSize: '80px 80px',
+          }}
+        />
+
+        {/* Noise Overlay */}
+        <div className="absolute inset-0 opacity-[0.02] bg-[url('data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHdpZHRoPSIzMDAiIGhlaWdodD0iMzAwIj48ZmlsdGVyIGlkPSJhIiB4PSIwIiB5PSIwIj48ZmVUdXJidWxlbmNlIGJhc2VGcmVxdWVuY3k9Ii43NSIgc3RpdGNoVGlsZXM9InN0aXRjaCIgdHlwZT0iZnJhY3RhbE5vaXNlIi8+PC9maWx0ZXI+PHJlY3Qgd2lkdGg9IjMwMCIgaGVpZ2h0PSIzMDAiIGZpbHRlcj0idXJsKCNhKSIgb3BhY2l0eT0iMC4wNSIvPjwvc3ZnPg==')]" />
+
+        {/* Three.js Light Pillar Effect */}
+        <div className="absolute inset-0 pointer-events-none" style={{ height: '100%' }}>
+          <LightPillar3D
+            topColor="#3b82f6"
+            bottomColor="#8b5cf6"
+            intensity={0.4}
+            rotationSpeed={0.3}
+            glowAmount={0.003}
+            pillarWidth={3}
+            pillarHeight={0.4}
+            noiseIntensity={0.3}
+            pillarRotation={15}
+            interactive={false}
+            mixBlendMode="screen"
+            quality="high"
+          />
+        </div>
+
+        {/* Antigravity Particles Effect - Follows Mouse */}
+        <div className="absolute inset-0 opacity-70">
+          <Antigravity
+            count={250}
+            magnetRadius={12}
+            ringRadius={10}
+            waveSpeed={0.5}
+            waveAmplitude={1.5}
+            particleSize={1.5}
+            lerpSpeed={0.08}
+            color="#3b82f6"
+            autoAnimate={false}
+            particleVariance={1.2}
+            rotationSpeed={0.3}
+            depthFactor={1.2}
+            pulseSpeed={2.5}
+            particleShape="capsule"
+            fieldStrength={10}
+          />
+        </div>
       </div>
 
-      {/* 3D Scene Background */}
-      {mounted && <Hero3DScene />}
-
-      {/* Floating tech icons */}
-      {mounted && floatingItems.map((item, index) => (
-        <div
+      {/* Floating Tech Icons */}
+      {mounted && floatingIcons.map(({ Icon, x, y, delay, size }, index) => (
+        <motion.div
           key={index}
-          className={`absolute ${item.position} hidden lg:block opacity-20`}
-          style={{
-            animation: `float 6s ease-in-out infinite`,
-            animationDelay: item.delay,
+          className="absolute hidden lg:block"
+          style={{ left: x, top: y }}
+          initial={{ opacity: 0, scale: 0 }}
+          animate={{
+            opacity: [0.2, 0.5, 0.2],
+            scale: [1, 1.1, 1],
+            y: [0, -20, 0],
+          }}
+          transition={{
+            duration: 4,
+            delay,
+            repeat: Infinity,
+            ease: 'easeInOut',
           }}
         >
           <div className="p-4 rounded-2xl bg-white/5 backdrop-blur-sm border border-white/10">
-            <item.icon className="h-8 w-8 text-white" />
+            <Icon size={size} className="text-blue-400/60" />
           </div>
-        </div>
+        </motion.div>
       ))}
 
-      {/* Grid pattern overlay */}
-      <div className="absolute inset-0 -z-10 opacity-[0.03]">
-        <div className="absolute inset-0" style={{
-          backgroundImage: 'linear-gradient(to right, white 1px, transparent 1px), linear-gradient(to bottom, white 1px, transparent 1px)',
-          backgroundSize: '60px 60px'
-        }} />
-      </div>
+      {/* Main Content */}
+      <div className="container relative z-10 px-4">
+        <div className="max-w-5xl mx-auto text-center">
+          {/* Badge */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="mb-8"
+          >
+            <span className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-gradient-to-r from-blue-500/20 to-purple-500/20 border border-blue-500/30 text-blue-400 text-sm font-medium backdrop-blur-sm">
+              <Sparkles className="w-4 h-4 animate-pulse" />
+              2-3 Hour Guaranteed Response Time
+              <Sparkles className="w-4 h-4 animate-pulse" />
+            </span>
+          </motion.div>
 
-      <div className="container py-16 sm:py-20 md:py-24 relative z-20">
-        <div className="grid lg:grid-cols-2 gap-12 lg:gap-8 items-center">
-          {/* Left Content */}
-          <div className={`text-center lg:text-left transition-all duration-1000 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-            {/* Company Name - Big & Bold */}
-            <div className="mb-6">
-              <h1 className="text-4xl sm:text-5xl md:text-6xl font-black tracking-tight">
-                <span className="text-transparent bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text">
-                  APEX
-                </span>
-                <span className="text-white">
-                  {' '}COMPUTER
-                </span>
+          {/* Main Title - DRAMATIC */}
+          <div className="mb-6">
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.2 }}
+            >
+              <h1 className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl font-black tracking-tighter mb-2">
+                <GlitchText
+                  text="APEX"
+                  className="bg-gradient-to-r from-blue-400 via-cyan-400 to-blue-500 bg-clip-text text-transparent animate-gradient-flow"
+                />
               </h1>
-              <p className="text-lg sm:text-xl md:text-2xl font-medium text-slate-400 tracking-[0.3em] mt-1">
-                TECHNOLOGY
-              </p>
-            </div>
+            </motion.div>
 
-            {/* Badge */}
-            <div className="mb-4 inline-flex items-center rounded-full border border-primary/30 bg-primary/10 backdrop-blur-sm px-4 py-2 text-sm font-medium text-primary shadow-lg shadow-primary/10">
-              <Sparkles className="mr-2 h-4 w-4" />
-              <span>2-3 Hour Guaranteed Response Time</span>
-            </div>
+            <motion.div
+              initial={{ opacity: 0, y: 50 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 1, delay: 0.5 }}
+            >
+              <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tighter text-white">
+                <FlipText text="COMPUTER" delay={0.8} />
+              </h1>
+            </motion.div>
 
-            {/* Tagline */}
-            <h2 className="mb-4 text-xl font-semibold tracking-tight sm:text-2xl md:text-3xl text-white">
-              Your Trusted{' '}
-              <span className="relative">
-                <span className="text-transparent bg-gradient-to-r from-primary via-blue-400 to-cyan-400 bg-clip-text">
-                  IT Partner
-                </span>
-              </span>
-              {' '}in Sri Lanka
-            </h2>
+            <motion.p
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 1, delay: 1.5 }}
+              className="text-2xl sm:text-3xl md:text-4xl font-light text-transparent bg-gradient-to-r from-slate-400 to-slate-600 bg-clip-text tracking-[0.3em] mt-4"
+            >
+              TECHNOLOGY
+            </motion.p>
+          </div>
 
-            {/* Subheadline */}
-            <p className="mb-6 text-base text-slate-300 sm:text-lg max-w-lg mx-auto lg:mx-0 leading-relaxed">
-              Premium IT products, expert repairs, and dedicated support.
-              Everything your business needs to stay connected and productive.
-            </p>
+          {/* Animated Line */}
+          <motion.div
+            className="w-32 h-1 mx-auto mb-8 rounded-full bg-gradient-to-r from-blue-500 via-cyan-400 to-purple-500"
+            initial={{ scaleX: 0 }}
+            animate={{ scaleX: 1 }}
+            transition={{ duration: 1, delay: 1.8 }}
+          />
 
-            {/* Highlights */}
-            <div className="mb-6 flex flex-col sm:flex-row gap-2 sm:gap-4 justify-center lg:justify-start flex-wrap">
-              {highlights.map((highlight) => (
-                <div key={highlight} className="flex items-center gap-2 text-slate-300">
-                  <CheckCircle2 className="h-4 w-4 text-green-400 shrink-0" />
-                  <span className="text-xs sm:text-sm">{highlight}</span>
-                </div>
-              ))}
-            </div>
+          {/* Tagline */}
+          <motion.h2
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 2 }}
+            className="text-xl sm:text-2xl md:text-3xl text-slate-300 mb-6 font-light"
+          >
+            Your Trusted{' '}
+            <span className="font-bold text-transparent bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text">
+              IT Partner
+            </span>{' '}
+            in Sri Lanka
+          </motion.h2>
 
-            {/* CTA Buttons */}
-            <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
-              <Button
-                size="lg"
-                className="bg-gradient-to-r from-primary to-blue-500 hover:from-primary/90 hover:to-blue-500/90 shadow-xl shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40 transition-all duration-300 px-8 text-lg h-14"
-                asChild
+          {/* Description */}
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.8, delay: 2.2 }}
+            className="text-lg text-slate-400 max-w-2xl mx-auto mb-8"
+          >
+            Premium IT products, expert repairs, and dedicated support.
+            Everything your business needs to stay connected.
+          </motion.p>
+
+          {/* Highlights */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 2.4 }}
+            className="flex flex-wrap justify-center gap-6 mb-10"
+          >
+            {['Genuine Products', 'Expert Support', 'Fast Delivery'].map((item, index) => (
+              <motion.div
+                key={item}
+                className="flex items-center gap-2 text-slate-300"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ delay: 2.5 + index * 0.1 }}
               >
-                <Link href="/products">
+                <CheckCircle2 className="w-5 h-5 text-green-400" />
+                <span>{item}</span>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTA Buttons */}
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 2.6 }}
+            className="flex flex-col sm:flex-row items-center justify-center gap-4 mb-8"
+          >
+            <Link href="/products">
+              <motion.button
+                className="group relative px-10 py-5 rounded-2xl font-bold text-lg overflow-hidden"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                {/* Animated gradient background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-cyan-500 to-blue-600 bg-[length:200%_100%] animate-gradient-flow" />
+
+                {/* Glow effect */}
+                <div className="absolute inset-0 bg-gradient-to-r from-blue-600 to-cyan-500 blur-xl opacity-50 group-hover:opacity-80 transition-opacity" />
+
+                <span className="relative z-10 flex items-center gap-2 text-white">
                   Shop Products
-                  <ArrowRight className="ml-2 h-5 w-5" />
-                </Link>
-              </Button>
-              <Button
-                size="lg"
-                variant="outline"
-                className="border-white/30 bg-white/10 text-white hover:bg-white/20 backdrop-blur-sm px-8 text-lg h-14"
-                asChild
+                  <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                </span>
+              </motion.button>
+            </Link>
+
+            <Link href="/services">
+              <motion.button
+                className="px-10 py-5 rounded-2xl font-bold text-lg border-2 border-white/20 text-white hover:bg-white/10 hover:border-white/40 transition-all backdrop-blur-sm"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.95 }}
               >
-                <Link href="/services">Our Services</Link>
-              </Button>
-            </div>
+                Our Services
+              </motion.button>
+            </Link>
+          </motion.div>
 
-            {/* WhatsApp Quick Contact */}
-            <div className="mt-6 flex items-center justify-center lg:justify-start gap-3">
-              <span className="text-sm text-slate-400">Quick Contact:</span>
-              <a
-                href={`https://wa.me/${COMPANY_INFO.whatsapp}?text=${encodeURIComponent("Hi, I'm interested in your IT products and services.")}`}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-[#25D366]/20 hover:bg-[#25D366]/30 border border-[#25D366]/50 rounded-full text-[#25D366] text-sm font-medium transition-colors"
-              >
-                <MessageCircle className="h-4 w-4" />
-                WhatsApp Us
-              </a>
-            </div>
-          </div>
-
-          {/* Right Content - Featured Image/Visual */}
-          <div className={`relative hidden lg:block transition-all duration-1000 delay-300 ${mounted ? 'opacity-100 translate-x-0' : 'opacity-0 translate-x-10'}`}>
-            <div className="relative">
-              {/* Main visual container */}
-              <div className="relative z-10 rounded-3xl overflow-hidden bg-gradient-to-br from-white/10 to-white/5 backdrop-blur-xl border border-white/10 p-8">
-                {/* Decorative elements */}
-                <div className="absolute top-4 left-4 flex gap-2">
-                  <div className="h-3 w-3 rounded-full bg-red-400" />
-                  <div className="h-3 w-3 rounded-full bg-yellow-400" />
-                  <div className="h-3 w-3 rounded-full bg-green-400" />
-                </div>
-
-                {/* Content grid */}
-                <div className="mt-6 grid grid-cols-2 gap-4">
-                  {[
-                    { label: 'Laptops', count: '50+', color: 'from-blue-500 to-cyan-500' },
-                    { label: 'Printers', count: '30+', color: 'from-purple-500 to-pink-500' },
-                    { label: 'Networking', count: '40+', color: 'from-orange-500 to-red-500' },
-                    { label: 'Accessories', count: '100+', color: 'from-green-500 to-emerald-500' },
-                  ].map((item) => (
-                    <div
-                      key={item.label}
-                      className="p-4 rounded-xl bg-white/5 border border-white/10 hover:bg-white/10 transition-colors group cursor-pointer"
-                    >
-                      <div className={`text-2xl font-bold bg-gradient-to-r ${item.color} bg-clip-text text-transparent`}>
-                        {item.count}
-                      </div>
-                      <div className="text-sm text-slate-400 group-hover:text-slate-300 transition-colors">
-                        {item.label}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-
-                {/* Bottom banner */}
-                <div className="mt-6 p-4 rounded-xl bg-gradient-to-r from-primary/20 to-blue-500/20 border border-primary/30">
-                  <div className="flex items-center justify-between">
-                    <div>
-                      <div className="text-white font-semibold">Free Consultation</div>
-                      <div className="text-sm text-slate-400">Get expert advice today</div>
-                    </div>
-                    <Button size="sm" variant="secondary" className="shrink-0" asChild>
-                      <Link href="/contact">Contact Us</Link>
-                    </Button>
-                  </div>
-                </div>
-              </div>
-
-              {/* Decorative circles */}
-              <div className="absolute -top-10 -right-10 h-40 w-40 rounded-full bg-primary/20 blur-2xl" />
-              <div className="absolute -bottom-10 -left-10 h-32 w-32 rounded-full bg-blue-500/20 blur-2xl" />
-            </div>
-          </div>
+          {/* WhatsApp */}
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ delay: 2.8 }}
+          >
+            <a
+              href={`https://wa.me/${COMPANY_INFO.whatsapp}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#25D366]/20 border border-[#25D366]/40 text-[#25D366] hover:bg-[#25D366]/30 transition-all"
+            >
+              <MessageCircle className="w-5 h-5" />
+              WhatsApp Us
+            </a>
+          </motion.div>
         </div>
 
         {/* Stats */}
-        <div className={`mt-16 sm:mt-20 grid grid-cols-2 gap-4 sm:gap-6 md:grid-cols-4 max-w-4xl mx-auto transition-all duration-1000 delay-500 ${mounted ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-10'}`}>
-          {stats.map(({ icon: Icon, value, label }) => (
-            <div
-              key={label}
-              className="group flex flex-col items-center rounded-2xl border border-white/10 bg-white/5 backdrop-blur-sm p-4 sm:p-6 text-center hover:bg-white/10 hover:border-white/20 transition-all duration-300 hover:-translate-y-1"
+        <motion.div
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 1, delay: 3 }}
+          className="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 max-w-4xl mx-auto"
+        >
+          {stats.map((stat, index) => (
+            <motion.div
+              key={stat.label}
+              className="relative group"
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 3.2 + index * 0.1 }}
+              whileHover={{ y: -5 }}
             >
-              <div className="mb-2 sm:mb-3 flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-xl bg-primary/20 text-primary group-hover:bg-primary group-hover:text-white transition-colors duration-300">
-                <Icon className="h-6 w-6 sm:h-7 sm:w-7" />
+              <div className="absolute inset-0 bg-gradient-to-r from-blue-500/20 to-purple-500/20 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity" />
+              <div className="relative p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm text-center hover:border-white/20 transition-colors">
+                <div className="text-3xl sm:text-4xl font-bold text-white mb-1">{stat.value}</div>
+                <div className="text-sm text-slate-400">{stat.label}</div>
               </div>
-              <div className="text-2xl sm:text-3xl font-bold text-white">{value}</div>
-              <div className="text-xs sm:text-sm text-slate-400 font-medium">{label}</div>
-            </div>
+            </motion.div>
           ))}
-        </div>
+        </motion.div>
       </div>
 
-      {/* Scroll indicator */}
-      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 hidden md:flex flex-col items-center gap-2 text-slate-400">
-        <span className="text-xs uppercase tracking-wider">Scroll to explore</span>
-        <div className="h-10 w-6 rounded-full border-2 border-slate-500 flex items-start justify-center p-1">
-          <div className="h-2 w-1 rounded-full bg-slate-400 animate-bounce" />
-        </div>
-      </div>
-
-      {/* Add custom CSS for floating animation */}
-      <style jsx>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px); }
-          50% { transform: translateY(-20px); }
-        }
-      `}</style>
+      {/* Scroll Indicator */}
+      <motion.div
+        className="absolute bottom-8 left-1/2 -translate-x-1/2"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 3.5 }}
+      >
+        <motion.div
+          className="w-6 h-10 rounded-full border-2 border-white/30 flex justify-center pt-2"
+          animate={{ borderColor: ['rgba(255,255,255,0.3)', 'rgba(59,130,246,0.5)', 'rgba(255,255,255,0.3)'] }}
+          transition={{ duration: 2, repeat: Infinity }}
+        >
+          <motion.div
+            className="w-1.5 h-3 rounded-full bg-blue-400"
+            animate={{ y: [0, 12, 0] }}
+            transition={{ duration: 1.5, repeat: Infinity }}
+          />
+        </motion.div>
+      </motion.div>
     </section>
   )
 }

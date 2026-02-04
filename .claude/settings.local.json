@@ -36,7 +36,11 @@
       "Bash(node scripts/setup-reports.mjs:*)",
       "Bash(node scripts/setup-signatures.mjs:*)",
       "Bash(wc:*)",
-      "Bash(node scripts/add-premium-products.mjs:*)"
+      "Bash(node scripts/add-premium-products.mjs:*)",
+      "WebFetch(domain:reactbits.dev)",
+      "WebSearch",
+      "WebFetch(domain:github.com)",
+      "WebFetch(domain:raw.githubusercontent.com)"
     ]
   }
 }
