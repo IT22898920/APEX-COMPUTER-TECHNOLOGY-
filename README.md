@@ -1,11 +1,12 @@
 # APEX Computer Technology
 
-A comprehensive Service & Sales Management System for a computer technology company in Sri Lanka. Built with Next.js 15, Supabase, and Tailwind CSS.
+A comprehensive Service & Sales Management System for a computer technology company in Sri Lanka. Built with Next.js 15, Supabase, and Tailwind CSS with stunning modern animations.
 
 ## Features
 
+### Core Features
 - **Multi-Role Authentication** - Admin, Staff (Technician, Marketing, Support), and Customer roles
-- **Product Catalog** - Browse and purchase IT products
+- **Product Catalog** - Browse and purchase IT products with categories
 - **Order Management** - Place orders with bank transfer payment
 - **Service Tickets** - Create and track service/repair requests
 - **Service Agreements** - Manage maintenance contracts (Comprehensive, Labour Only, On-Call)
@@ -13,15 +14,23 @@ A comprehensive Service & Sales Management System for a computer technology comp
 - **Real-time Updates** - Live data updates using Supabase subscriptions
 - **Responsive Design** - Mobile-first design with Tailwind CSS
 
+### Modern UI/UX
+- **3D Animations** - Light Pillar 3D effect with WebGL shaders
+- **Particle System** - Antigravity particles following mouse movement
+- **Scroll Animations** - Parallax, fade, scale, stagger effects
+- **Glassmorphism Header** - Floating header with magnetic hover effects
+- **Brand Marquee** - Smooth scrolling brand showcase
+
 ## Tech Stack
 
 - **Framework**: Next.js 15 (App Router)
 - **Language**: TypeScript
 - **Database**: Supabase (PostgreSQL)
-- **Authentication**: Supabase Auth
+- **Authentication**: Supabase Auth (Email + Google OAuth)
 - **Styling**: Tailwind CSS v4 + shadcn/ui
+- **Animations**: Framer Motion + Three.js + React Three Fiber
 - **Email**: Resend
-- **Validation**: Zod
+- **Validation**: Zod + React Hook Form
 - **Icons**: Lucide React
 
 ## Getting Started
@@ -86,13 +95,26 @@ src/
 │   │   └── customer/      # Customer portal
 │   └── (public)/          # Public pages
 ├── components/
+│   ├── landing/           # Landing page sections
+│   │   ├── home-v2.tsx    # Hero section with 3D effects
+│   │   ├── products-section-v2.tsx
+│   │   ├── services-section-v2.tsx
+│   │   ├── testimonials.tsx
+│   │   └── cta-section-v2.tsx
 │   ├── layout/            # Layout components
-│   ├── ui/                # shadcn/ui components
-│   └── sections/          # Page sections
+│   │   ├── header.tsx     # Glassmorphism floating header
+│   │   └── footer.tsx
+│   ├── ui/                # shadcn/ui + custom components
+│   │   ├── scroll-animations.tsx  # Scroll animation components
+│   │   ├── light-pillar-3d.tsx    # WebGL light beam effect
+│   │   ├── antigravity.tsx        # Particle system
+│   │   └── glitch-text.tsx        # Text effects
+│   └── sections/          # Other page sections
 ├── lib/
 │   ├── supabase/          # Supabase clients
 │   ├── email/             # Email utilities (Resend)
 │   ├── hooks/             # Custom React hooks
+│   ├── auth/              # Authentication helpers
 │   ├── utils/             # Utility functions
 │   └── validations/       # Zod schemas
 └── types/                 # TypeScript definitions
@@ -108,44 +130,58 @@ src/
 | **Support** | Customer service, tickets |
 | **Customer** | View orders, create service tickets |
 
-## Email Configuration
+## Animation Components
 
-The system uses [Resend](https://resend.com) for sending emails.
+### Light Pillar 3D
+WebGL-powered volumetric light beam with customizable colors, intensity, and rotation.
+```tsx
+<LightPillar3D
+  topColor="#3b82f6"
+  bottomColor="#8b5cf6"
+  intensity={0.3}
+  rotationSpeed={0.2}
+/>
+```
 
-### Setup
+### Antigravity Particles
+Interactive particle system that follows mouse movement.
+```tsx
+<Antigravity
+  count={150}
+  magnetRadius={15}
+  particleShape="sphere"
+  color="#60a5fa"
+/>
+```
 
-1. Create a Resend account at https://resend.com
-2. Get your API key from https://resend.com/api-keys
-3. Add `RESEND_API_KEY` to your `.env.local`
-
-### Domain Verification (Production)
-
-For production, verify your domain at https://resend.com/domains to send emails to any recipient.
-
-**Free Plan Limits:**
-- 100 emails/day
-- 3,000 emails/month
+### Scroll Animations
+Reusable animation components for scroll-triggered effects.
+```tsx
+<ScrollFade>Content</ScrollFade>
+<Parallax speed={0.5}>Content</Parallax>
+<StaggerContainer><StaggerItem>Item</StaggerItem></StaggerContainer>
+<Magnetic strength={0.2}><Button>Hover me</Button></Magnetic>
+```
 
 ## Database
 
 ### Core Tables
 
-- `profiles` - User profiles
+- `profiles` - User profiles (synced with auth.users)
 - `products` - Product catalog
 - `categories` - Product categories
+- `services` - Service offerings
 - `orders` - Customer orders
 - `order_items` - Order line items
 - `service_tickets` - Service/repair tickets
 - `service_agreements` - Maintenance contracts
 - `bank_accounts` - Payment bank details
 - `payment_receipts` - Payment proofs
+- `testimonials` - Customer reviews
 
 ### Running Migrations
 
-Execute SQL files in `supabase/migrations/` in order:
-1. `00001_initial_schema.sql`
-2. `00002_services_and_products.sql`
-3. `00003_payment_system.sql`
+Execute SQL files in `supabase/migrations/` in order via Supabase SQL Editor.
 
 ## Scripts
 
@@ -154,6 +190,7 @@ npm run dev      # Start development server
 npm run build    # Production build
 npm run start    # Start production server
 npm run lint     # Run ESLint
+npx tsc --noEmit # Type check
 ```
 
 ## Deployment
@@ -168,16 +205,9 @@ npm run lint     # Run ESLint
 ### Environment Variables for Production
 
 - Update `NEXT_PUBLIC_SITE_URL` to your production URL
-- Update Supabase Auth settings (Site URL, Redirect URLs)
+- Configure Supabase Auth settings (Site URL, Redirect URLs)
+- Add Google OAuth credentials for Google login
 - Verify email domain in Resend
-
-## Contributing
-
-1. Fork the repository
-2. Create a feature branch
-3. Commit your changes
-4. Push to the branch
-5. Open a Pull Request
 
 ## License
 
@@ -188,3 +218,4 @@ This project is proprietary software for APEX Computer Technology.
 - Phone: +94 77 777 0003
 - Email: apex@isplanka.lk
 - WhatsApp: +94 77 777 0003
+- Website: https://purelech.lk
